@@ -1,15 +1,16 @@
 import { useState, useRef } from "react";
 import {v4 as uuidv4} from "uuid"
 import Trees from "./Trees"
+import "./App.css"
 
-
+// todo: add complete button
 
 function App() {
   // initial task
   const task = {
     id: uuidv4(),
     text: "root1",
-    deadline: new Date('2024-05-15'),
+    deadline: new Date('2024-01-01'),
     completed: false,
     root: 1,
     children: [],
@@ -24,11 +25,14 @@ function App() {
 
   // add root task
   const handleAddTask = () => {
-    
+    let deadline = new Date();
+    if(taskDateRef.current.value!=""){
+      deadline = new Date(taskDateRef.current.value);
+    }
     const task = {
       id: uuidv4(),
       text: taskNameRef.current.value,
-      deadline: new Date(taskDateRef.current.value),
+      deadline: deadline,
       completed: false,
       root: 1,
       children: []
@@ -65,13 +69,15 @@ function App() {
     return currentNode;
   };
 
-  return <div>
+  return <div className="container">
     <div>
+      <Trees taskTrees={taskTrees} addChildTask={addChildTask} />
+      
       <input type='date' ref={taskDateRef}/>
       <input type="text" ref={taskNameRef}/>
       <button onClick={handleAddTask}>親タスクを追加</button>
     </div>
-    <Trees taskTrees={taskTrees} addChildTask={addChildTask} />
+    
   </div>;
 }
 
