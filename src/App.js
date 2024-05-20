@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import {v4 as uuidv4} from "uuid"
-import Trees from "./Trees"
-import "./App.css"
+import Trees from "./components/Trees"
+import "./css/App.css"
 import { Button, Container, Checkbox, TextField, Box, Stack, createTheme, ThemeProvider, CssBaseline } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -16,7 +16,8 @@ const darkTheme = createTheme({
   },
 });
 
-// todo: improve ui
+// todo: add task finish animation
+// todo: implement backend
 
 function App() {
   const [taskTrees, setTaskTrees] = useState([]);

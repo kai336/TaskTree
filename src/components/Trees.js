@@ -1,6 +1,6 @@
 import React from 'react'
 import Task from './Task';
-import "./App.css";
+import "../App";
 
 //親タスクの配列を読み込む
 const Trees = ({taskTrees, addChildTask}) => {

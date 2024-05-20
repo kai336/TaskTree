@@ -1,13 +1,11 @@
 import { useRef, useState, React } from 'react';
 import {v4 as uuidv4} from 'uuid'; 
 import Trees from './Trees';
-import "./App.css"
+import "../css/App.css"
 import { Button, Container, Checkbox, TextField, Box, Stack, Paper } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs';
-import { jaJP } from "@mui/x-date-pickers/locales";
-
 
 const Task = ({task, addChildTask}) => {
     const [taskDate, setTaskDate] = useState(dayjs());
@@ -17,6 +15,7 @@ const Task = ({task, addChildTask}) => {
 
     const handleChange = (event) => {
         setChecked(event.target.checked);
+        task.completed = event.target.checked;
       };
 
     const handleButtonClick = () => {
@@ -33,11 +32,12 @@ const Task = ({task, addChildTask}) => {
             children: []
         };
         addChildTask(task.id, newTask)
+        setTaskText('')
     };
 
     return (
         <Container maxWidth='sm'>
-            <Paper sx={{ width: 300, height: 100}}>
+            <Paper sx={{width:300}}>
                 <Stack direction="row" spacing={2}>
                     <Checkbox checked={checked} onChange={handleChange} />
                     <div>
