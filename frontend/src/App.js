@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {v4 as uuidv4} from "uuid"
 import Trees from "./components/Trees"
 import ButtonAppBar from "./components/Header";
@@ -25,7 +25,31 @@ function App() {
   const [taskDate, setTaskDate] = useState(dayjs());
   const [taskText, setTaskText] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/'); // ここに実際のAPIのURLを記入
+        console.log(response);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // 空の依存配列により、コンポーネントのマウント時にのみ実行されます
+
+  console.log(data);
 
   // add root task
   const addRootTask = () => {
