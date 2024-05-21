@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import {v4 as uuidv4} from "uuid"
 import Trees from "./components/Trees"
+import ButtonAppBar from "./components/Header";
 import "./css/App.css"
 import { Button, Container, Checkbox, TextField, Box, Stack, createTheme, ThemeProvider, CssBaseline } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -8,7 +9,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
 import { jaJP } from "@mui/x-date-pickers/locales";
 
-dayjs.locale(jaJP);
+dayjs.locale(jaJP); 
 
 const darkTheme = createTheme({
   palette: {
@@ -75,6 +76,7 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
         <Container maxWidth='sm'>
+          <ButtonAppBar />
           <Stack direction='column' sx={{my:2}} spacing={2}>
             <Button onClick={handleButtonClick}>親タスクを追加</Button>
             {showForm && (

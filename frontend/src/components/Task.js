@@ -44,6 +44,7 @@ const Task = ({task, addChildTask}) => {
                         <div>締め切り: {task.deadline.format('YYYY/MM/DD')}</div>
                         <div>内容: {task.text}</div>
                     </div>
+                    {task.completed && <Button>削除</Button>}
                 </Stack>
                 <Stack direction='column' sx={{my:2}} spacing={2}>
                     <Button onClick={handleButtonClick}>サブタスクを追加</Button>
