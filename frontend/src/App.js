@@ -11,6 +11,17 @@ import { jaJP } from "@mui/x-date-pickers/locales";
 
 dayjs.locale(jaJP); 
 
+class Task {
+  constructor(id, text, deadline, completed, root, children) {
+    this.id = id;
+    this.text = text;
+    this.deadline = deadline;
+    this.completed = completed;
+    this.root = root;
+    this.children = children;
+  }
+}
+
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -19,6 +30,60 @@ const darkTheme = createTheme({
 
 // todo: add task finish animation
 // todo: implement backend
+
+// convert json to single task
+const dataToSingleTask = (data, children) => {
+  return new Task(
+    data.task_id,
+    data.description,
+    data.deadline,
+    data.completed,
+    data.root_id,
+    children
+  )
+}
+
+// convert json to root tasks
+const dataToTaskRoots = (datas) => {
+  const rootTasks = datas
+  .filter(data => {
+    return data.task_id === data.root_id // filter root task
+  })
+  .map(data => { // make task
+    return new Task(
+      data.task_id,
+      data.description,
+      data.deadline,
+      data.completed,
+      data.root_id,
+      [] // temporaly initialize children
+    );
+  });
+  return rootTasks;
+};
+
+// wip
+// get children tasks and build task tree
+const taskRootsToTaskTrees = (taskRoots, datas) => {
+  const taskTrees = taskRoots.map(rootTask => { // for all root tasks
+    const rootData = datas.find(data => data.task_id === rootTask.task_id); // get the data of root task
+    if(!rootData) {
+      return null; // return null if root task is not found
+    };
+    const getChildTasks = (taskId) => { // return array of child tasks
+      const parentTask = datas.find(data => data.task_id === taskId); // find parent task from id
+      const chidlTasks = parentTask.children.map(childId => { // for all children
+        const childData = datas.find(data => data.task_id === childId);
+        if(!childData) {
+          return null; // if child was not found, return null
+        };
+        return dataToSingleTask(childData, []);
+      });
+    };
+    return dataToSingleTask(rootTask, getChildTasks(rootTask));
+  });
+  return taskTrees;
+};
 
 function App() {
   const [taskTrees, setTaskTrees] = useState([]);
@@ -49,18 +114,17 @@ function App() {
     fetchData();
   }, []); // 空の依存配列により、コンポーネントのマウント時にのみ実行されます
 
-  console.log(data);
+  if(data.length != 0){
+    console.log(dataToTaskRoots(data));
+    const rootTasks = dataToTaskRoots(data);
+    const Tasks = taskRootsToTaskTrees(rootTasks, data);
+    console.log(Tasks); // not working
+  }
 
   // add root task
   const addRootTask = () => {
     console.log(taskText);
-    const newTask = {
-        id: uuidv4(),
-        text: taskText,
-        deadline: taskDate,
-        completed: false,
-        children: []
-    };
+    const newTask = new Task(uuidv4(), taskText, taskDate, false, 0, []);
     newTask.root = newTask.id;
     setTaskTrees((parentTask) => {
       return [...parentTask, newTask]
@@ -83,7 +147,7 @@ function App() {
   };
 
   
-
+  // insert child task
   const updateTaskTree = (currentNode, id, newTask) => {
     if(currentNode.id === id){
       console.log('fonud');

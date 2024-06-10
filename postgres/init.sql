@@ -1,42 +1,28 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE taskTree (
+DROP TABLE IF EXISTS task_tree;
+
+CREATE TABLE task_tree (
     user_id UUID,
     task_id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-    parent_id UUID,
+    children UUID[],
     root_id UUID,
-    text VARCHAR(255),
-    deadline VARCHAR(255) UNIQUE NOT NULL,
-    completed BOOLEAN,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY (parent_id) REFERENCES taskTree(task_id)
+    description VARCHAR(255) NOT NULL,
+    deadline DATE NOT NULL,
+    completed BOOLEAN DEFAULT false
 );
 
-CREATE TABLE rootTree (
-    user_id UUID,
-    task_id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-    
-)
+INSERT INTO task_tree (user_id, task_id, root_id, description, deadline, completed)
+    VALUES ('d03cc72c-a129-49a2-a7b7-fa9097bab9e6', 'ed011eb7-bcca-4746-a739-4979eafed2b9', 'ed011eb7-bcca-4746-a739-4979eafed2b9', 'this is a test root1', '2024-06-10', false);
 
-CREATE TABLE reservations (
-    reservation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-    user_id UUID REFERENCES users(user_id) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    is_all_day BOOLEAN NOT NULL,
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
+UPDATE task_tree SET children = COALESCE(children, ARRAY[]::UUID[]) || '{8ee874e6-a5c7-4b4e-83ea-b5a7a4bd2904}'
+WHERE user_id = 'd03cc72c-a129-49a2-a7b7-fa9097bab9e6' AND task_id = 'ed011eb7-bcca-4746-a739-4979eafed2b9';
 
--- usersテーブルに初期のサンプルデータを挿入
-INSERT INTO users (user_id, name, email, image_url, created_at, updated_at)
-VALUES 
-    ('1935980d-81bc-4b59-9dfe-88f48fde9700', 'John Doe', 'john@example.com', 'https://web-jp-assets-v2.mercdn.net/_next/static/media/avatar3.1f4d50ec.png', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('aeb10db8-6ad3-4998-ac4f-f29a1152b7f9', 'Jane Smith', 'jane@example.com', 'https://web-jp-assets-v2.mercdn.net/_next/static/media/avatar8.22bb62c8.png', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO task_tree (user_id, task_id, root_id, description, deadline, completed)
+    VALUES ('d03cc72c-a129-49a2-a7b7-fa9097bab9e6', '8ee874e6-a5c7-4b4e-83ea-b5a7a4bd2904', 'ed011eb7-bcca-4746-a739-4979eafed2b9', 'this is a test children1', '2024-06-10', false);
 
--- reservationsテーブルに初期のサンプルデータを挿入
-INSERT INTO reservations (user_id, title, is_all_day, start_time, end_time, created_at, updated_at)
-VALUES
-    ('1935980d-81bc-4b59-9dfe-88f48fde9700', 'Meeting', FALSE, '2024-05-07T09:00:00Z', '2024-05-07T10:00:00Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('aeb10db8-6ad3-4998-ac4f-f29a1152b7f9', 'Conference', TRUE, '2024-05-08T00:00:00Z', '2024-05-09T00:00:00Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO task_tree (user_id, task_id, root_id, description, deadline, completed)
+    VALUES ('d03cc72c-a129-49a2-a7b7-fa9097bab9e6', 'c583ee3f-616a-4ea2-b6d4-0c4df790ae5e', 'ed011eb7-bcca-4746-a739-4979eafed2b9', 'this is a test children2', '2024-06-10', false);
+
+INSERT INTO task_tree (user_id, task_id, root_id, description, deadline, completed)
+    VALUES ('d03cc72c-a129-49a2-a7b7-fa9097bab9e6', '4c46160e-2874-4f8f-99b2-1b4dd3b3e89a', '4c46160e-2874-4f8f-99b2-1b4dd3b3e89a', 'this is a test root2', '2024-06-10', false);

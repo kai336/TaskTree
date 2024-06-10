@@ -18,7 +18,7 @@ const pool = new Pool({
 
 app.get('/', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM persons');
+    const result = await pool.query('SELECT * FROM task_tree');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
