@@ -9,6 +9,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
 import { jaJP } from "@mui/x-date-pickers/locales";
+import axios from 'axios';
 
 dayjs.locale(jaJP);
 
@@ -25,7 +26,7 @@ export class Task {
 
 const darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
   },
 });
 
@@ -42,6 +43,12 @@ todo: implement backend
           - add root task
             => add root task to DB
 
+          - delete leaf task
+            => just delete
+          - delete non-leaf task
+            => show dialoge 'all child task will be deleted!!!'
+            => delete recursively
+
           after each operation, reflesh data and render screen
 
 */
@@ -56,15 +63,16 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchTaskTrees = async () => {
       try {
-        const response = await fetch('http://localhost:5000/'); // ここに実際のAPIのURLを記入
+        const response = await axios.get(`http://localhost:5000/tasktrees`);
         console.log(response);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        const data = response.data;
+        if (Array.isArray(data)) {
+          setData(data);
+        } else {
+          console.log('data is not array', data);
         }
-        const result = await response.json();
-        setData(result);
       } catch (error) {
         setError(error);
       } finally {
@@ -72,11 +80,11 @@ function App() {
       }
     };
 
-    fetchData();
+    fetchTaskTrees();
   }, []); // 空の依存配列により、コンポーネントのマウント時にのみ実行されます
 
   useEffect(() => {
-    if (data.length != 0) {
+    if (data.length !== 0) {
       const usersTaskTrees = dataToTaskTrees(data);
       setTaskTrees(usersTaskTrees);
       console.log(taskTrees);
@@ -97,17 +105,27 @@ function App() {
   };
 
   // add child task
-  const addChildTask = (id, newTask) => {
+  const addChildTask = (parentId, newTask) => {
     let newTaskTrees = [...taskTrees];
     newTaskTrees = newTaskTrees.map((taskTree) => {
-      return updateTaskTree(taskTree, id, newTask);
+      return updateTaskTree(taskTree, parentId, newTask);
     });
     setTaskTrees(newTaskTrees);
     console.log(newTask);
   };
 
-  const handleButtonClick = () => {
+  const handleAddRootButtonClick = () => {
     setShowForm(!showForm);
+  };
+  
+  const handleTestButtonClick = async () => {
+    try {
+      const query = {userId: 'testuserid', taskId: 'testtaskid'};
+      const response = await axios.get(`http://localhost:5000/reqtest`, {params: query});
+      console.log(response);
+    } catch (error) {
+      setError(error);
+    }
   };
 
 
@@ -129,8 +147,9 @@ function App() {
       <CssBaseline />
       <Container maxWidth='sm'>
         <ButtonAppBar />
+        <Button onClick={handleTestButtonClick}>test</Button>
         <Stack direction='column' sx={{ my: 2 }} spacing={2}>
-          <Button onClick={handleButtonClick}>親タスクを追加</Button>
+          <Button onClick={handleAddRootButtonClick}>親タスクを追加</Button>
           {showForm && (
             <Stack direction='row' sx={{ my: 2 }} spacing={1}>
               <TextField

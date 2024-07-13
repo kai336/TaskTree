@@ -6,6 +6,7 @@ import { Button, Container, Checkbox, TextField, Box, Stack, Paper } from "@mui/
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs';
+import axios from 'axios';
 
 const Task = ({task, addChildTask}) => {
     const [taskDate, setTaskDate] = useState(dayjs());
@@ -25,7 +26,7 @@ const Task = ({task, addChildTask}) => {
     const handleAddChildTask = () => {
         const newTask = {
             id: uuidv4(),
-            text: taskText,
+            description: taskText,
             deadline: taskDate,
             completed: false,
             root: task.root,
